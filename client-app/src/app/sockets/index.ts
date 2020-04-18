@@ -3,7 +3,11 @@ import store from '../store';
 import {DaddyGameTypes} from '../common/types'
 
 const SocketClient = () => {
-   let socket: SocketIOClient.Socket = openSocket("http://localhost:5000/daddy", {
+    let baseUrl = "";
+    if(process.env.NODE_ENV === "development") {
+        baseUrl = "http://localhost:5000"
+    }
+   let socket: SocketIOClient.Socket = openSocket(`${baseUrl}/daddy`.trim(), {
        upgrade: false
    });
    

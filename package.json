@@ -7,7 +7,7 @@
     "node": "10.x"
   },
   "scripts": {
-    "build": "(cd client-app && npm run build) && (cd server && npm run build)",
+    "build": "(cd client-app && npm install && npm run build) && (cd server && npm install && npm run build)",
     "start": "(cd server && node dist/index.js)",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

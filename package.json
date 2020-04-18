@@ -1,0 +1,24 @@
+{
+  "name": "daddy-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./server/dist/index.js",
+  "engines": {
+    "node": "10.x"
+  },
+  "scripts": {
+    "build": "(cd client-app && npm run build) && (cd server && npm run build)",
+    "start": "(cd server && node dist/index.js)",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naveenrayudu/game-daddy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naveenrayudu/game-daddy/issues"
+  },
+  "homepage": "https://github.com/naveenrayudu/game-daddy#readme"
+}

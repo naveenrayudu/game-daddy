@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_1 = __importDefault(require("socket.io"));
+const gridProperties_1 = __importDefault(require("../helpers/gridProperties"));
 const SocketClient = (httpServer) => {
     const io = socket_io_1.default(httpServer);
     const gameNameSpace = '/daddy';
@@ -13,6 +14,7 @@ const SocketClient = (httpServer) => {
         socket.on("join", (room, fn) => joinGame(socket, gameNameSpace, room, daddyPlayers, fn));
         socket.on('leave', (room) => leaveGame(socket, room));
         socket.on('callServerToUpdatePositions', updateGamePositions);
+        socket.on('deletePlayerPawns', deletePlayerPawns);
     });
     const createGame = (socket, gameNameSpace, playersCount, fn) => {
         const roomNumber = createRandomRoomNumber();
@@ -37,14 +39,33 @@ const SocketClient = (httpServer) => {
             }
         });
     };
-    const updateGamePositions = (roomId, playerId, index, currentGamePositions) => {
+    const updateGamePositions = (roomId, playerId, index, currentGamePositions, pawnsInfo) => {
         if (!currentGamePositions[playerId]) {
             currentGamePositions[playerId] = [index];
         }
         else {
             currentGamePositions = Object.assign(Object.assign({}, currentGamePositions), { [playerId]: [...currentGamePositions[playerId], index] });
         }
-        io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, playerId % daddyPlayers + 1);
+        if (pawnsInfo[playerId]) {
+            pawnsInfo[playerId].availablePawns = pawnsInfo[playerId].availablePawns - 1;
+        }
+        // check if the position placed is a daddy.
+        const isDaddy = checkIfPositionIsInDaddy(index, currentGamePositions[playerId]);
+        let updatedPlayerId = playerId % daddyPlayers + 1;
+        let positionsToDelete = [];
+        if (isDaddy) {
+            updatedPlayerId = playerId;
+            positionsToDelete = getPositionsThatCanBeDeletedByPlayer(playerId, currentGamePositions);
+        }
+        io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, updatedPlayerId, pawnsInfo, isDaddy, positionsToDelete);
+    };
+    const deletePlayerPawns = (roomId, playerId, index, currentGamePositions, pawnsInfo) => {
+        const otherPlayerId = playerId % daddyPlayers + 1;
+        const updatedOtherPlayerPosition = currentGamePositions[otherPlayerId].filter(t => t !== index);
+        const updatedOtherPlayersPawnsInfo = Object.assign(Object.assign({}, pawnsInfo[otherPlayerId]), { unavailablePawns: pawnsInfo[otherPlayerId].unavailablePawns + 1 });
+        const newPositions = Object.assign(Object.assign({}, currentGamePositions), { [otherPlayerId]: updatedOtherPlayerPosition });
+        const updatedPawns = Object.assign(Object.assign({}, pawnsInfo), { [otherPlayerId]: updatedOtherPlayersPawnsInfo });
+        io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', newPositions, otherPlayerId, updatedPawns, false, []);
     };
     const leaveGame = (socket, room) => {
         if (Object.keys(socket.rooms).indexOf(room) === -1) {
@@ -61,6 +82,34 @@ const SocketClient = (httpServer) => {
     };
     const getRoomClientsCount = (gameNameSpace, room) => {
         return io.of(gameNameSpace).adapter.rooms[room].length;
+    };
+    const getPositionsThatCanBeDeletedByPlayer = (playerId, currentGamePositions) => {
+        debugger;
+        const positionsToDelete = [];
+        const otherPlayerId = Object.keys(currentGamePositions).find(t => t !== playerId.toString());
+        if (otherPlayerId && currentGamePositions[parseInt(otherPlayerId, 10)]) {
+            const otherPlayerPositions = currentGamePositions[parseInt(otherPlayerId, 10)];
+            otherPlayerPositions.forEach((t => {
+                if (!checkIfPositionIsInDaddy(t, otherPlayerPositions)) {
+                    positionsToDelete.push(t);
+                }
+            }));
+            // if there are no valid positions to delete, then allow any positions to delete
+            if (positionsToDelete.length === 0) {
+                otherPlayerPositions.forEach(t => {
+                    positionsToDelete.push(t);
+                });
+            }
+        }
+        return positionsToDelete;
+    };
+    const checkIfPositionIsInDaddy = (position, currentPlayerPositions) => {
+        const validDaddyPosition = gridProperties_1.default.scorePointsByIndex[position];
+        if (!currentPlayerPositions || !validDaddyPosition)
+            return false;
+        return validDaddyPosition.some((validPosition) => {
+            return validPosition.every(t => currentPlayerPositions.indexOf(t) !== -1);
+        });
     };
     return io;
 };

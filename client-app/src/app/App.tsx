@@ -1,13 +1,14 @@
 import React from 'react';
 import './app.css';
-import GameGrid from './features/game-grid/GameGrid';
+import Game from './features/game/Game';
 import SocketClient from './sockets';
 import {  useSelector } from 'react-redux';
 import { IAppState } from './common/models/redux-state';
 import Modal from './features/modal/Modal';
 import CreateJoinGame from './features/create-join-game/CreateJoinGame';
+import GridHelper from './helpers/gridProperties';
 
-
+console.log(GridHelper.validPointPositions)
 const App: React.FC = () => {
     const {roomId, playersCount, canPlayGame} = useSelector(((state: IAppState) => ({
         roomId: state.daddyGame.roomId,
@@ -30,7 +31,7 @@ const App: React.FC = () => {
 
     return (
         <div id="app-container">
-            {canPlayGame && <GameGrid /> }
+            { canPlayGame && <Game /> }
             {!canPlayGame && <CreateJoinGame playersCount={playersCount} roomId={roomId} createRoomEvent={createRoom} joinRoomEvent={joinRoom} leaveRoomEvent={leaveRoom}  /> }
             <Modal />
         </div>

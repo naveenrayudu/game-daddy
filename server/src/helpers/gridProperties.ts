@@ -78,11 +78,25 @@ const generateGamePositions = () => {
     });
 
     
+    const scorePointsByIndex = validPointPositions.reduce((acc, cur) => {
+        cur.forEach((ele) => {
+            if(acc[ele]) {
+                acc[ele].push(cur);
+            }else {
+                acc[ele] = [cur];
+            }
+        })
+        return acc;
+    
+    }, {} as {
+        [id: number] : number[][]
+    })
     
 
     return {
         gamePositions,
         validPointPositions,
+        scorePointsByIndex,
         validMoves
     }
 }

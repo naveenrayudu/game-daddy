@@ -9,7 +9,15 @@ export interface IDaddyGameState {
     playerId: number,
     isCurrentPlayer: boolean,
     canPlayGame: boolean,
+    isDaddy: boolean,
     gamePlayerIds: number[],
+    positionsToDelete: number[],
+    pawnsInfo: {
+        [playerId:number] : {
+            availablePawns: number,
+            unavailablePawns: number
+        }
+    },
     gamePositions: {
         [playerId:number] : number[]
     }

@@ -1,0 +1,125 @@
+
+.grid_0 {
+    grid-area: area0;
+    display: flex;
+}
+.grid_1 {
+    grid-area: area1;
+    display: flex;
+}
+.grid_2 {
+    grid-area: area2;
+    display: flex;
+}
+.grid_3 {
+    grid-area: area3;
+    display: flex;
+}
+.grid_4 {
+    grid-area: area4;
+    display: flex;
+}
+.grid_5 {
+    grid-area: area5;
+    display: flex;
+}
+.grid_6 {
+    grid-area: area6;
+    display: flex;
+}
+.grid_7 {
+    grid-area: area7;
+    display: flex;
+}
+
+.grid_0 > div, .grid_3 > div,  .grid_5 > div {
+    left: -10%;
+}
+
+.grid_2 > div, .grid_4 > div,  .grid_7 > div {
+    right: -15%;
+}
+
+.grid_5 > div, .grid_6 > div,  .grid_7 > div {
+    bottom: -15%;
+}
+
+.grid_0 > div, .grid_1 > div,  .grid_2 > div {
+    top: -10%;
+}
+
+.grid_1, .grid_6 {
+    justify-content: center;
+}
+
+.grid_0, .grid_3, .grid_5 {
+    justify-content: flex-start;
+}
+
+.grid_2, .grid_4, .grid_7 {
+    justify-content: flex-end;
+}
+
+.grid_3, .grid_4 {
+    align-items: center;
+}
+
+.box--class {
+    display: grid;
+    position: absolute;
+    border: 1px solid black;
+    margin: auto;
+    grid-template-columns: repeat(3, 33%);
+    grid-template-rows: repeat(3, 33%);
+    grid-template-areas: 
+    "area0 area1 area2"
+    "area3 . area4"
+    "area5 area6 area7";
+}
+
+.grid-content--class {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 80%;
+}
+
+.box--class .grid_3 .grid-content--class:after {
+    content: "";
+    border-top: 1px solid black;
+    width: 100%;
+    position: absolute;
+    right:-100%;
+}
+
+.box--class .grid_4 .grid-content--class:after {
+    content: "";
+    border-top: 1px solid black;
+    width: 100%;
+    position: absolute;
+    right:100%;
+}
+
+.box--class .grid_1 .grid-content--class:after{
+    content: "";
+    border-left: 1px solid black;
+    height: 100%;
+    position: absolute;
+    top: 100%;
+}
+
+.box--class .grid_6 .grid-content--class:after {
+    content: "";
+    border-left: 1px solid black;
+    height: 100%;
+    position: absolute;
+    top: -100%;
+}
+
+.box-2--class .grid_1 .grid-content--class:after,
+.box-2--class .grid_3 .grid-content--class:after,
+.box-2--class .grid_4 .grid-content--class:after,
+.box-2--class .grid_6 .grid-content--class:after {
+    content: "";
+    display: none;
+}

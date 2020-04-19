@@ -1,10 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const generateGamePositions = () => {
     const numberOfBoxes = 3;
     const numberOfPointsPerBox = 8;
     const positionsForLine = 3;
-    const gamePositions: number[] = [];
-    const validPointPositions: number[][] = [];
-    const validMoves: number[][] = [
+    const gamePositions = [];
+    const validPointPositions = [];
+    const validMoves = [
         [1, 3],
         [0, 2, 9],
         [1, 4],
@@ -30,63 +32,60 @@ const generateGamePositions = () => {
         [14, 21, 23],
         [20, 22]
     ];
-
     for (let boxes = 0; boxes < numberOfBoxes; boxes++) {
         for (let positions = 0; positions < numberOfPointsPerBox; positions++) {
             const currentPosition = boxes * numberOfPointsPerBox + positions;
             gamePositions.push(currentPosition);
         }
-
-       
         //top
-        const topLinePositions: number[] = [];
-        for (let position = boxes * numberOfPointsPerBox; position <  boxes * numberOfPointsPerBox + positionsForLine; position++) {
-           topLinePositions.push(position)
+        const topLinePositions = [];
+        for (let position = boxes * numberOfPointsPerBox; position < boxes * numberOfPointsPerBox + positionsForLine; position++) {
+            topLinePositions.push(position);
         }
-
         //bottom
-        const bottomLinePositions: number[] = [];
+        const bottomLinePositions = [];
         for (let position = (boxes * numberOfPointsPerBox) + positionsForLine * 2 - 1; position < boxes * numberOfPointsPerBox + numberOfPointsPerBox; position++) {
-            bottomLinePositions.push(position)
+            bottomLinePositions.push(position);
         }
-
         //left
-        const leftLinePosition: number[] = [];
+        const leftLinePosition = [];
         let positionsToSkip = positionsForLine;
         for (let position = boxes * numberOfPointsPerBox; position < boxes * numberOfPointsPerBox + numberOfPointsPerBox - 1; position = position + positionsToSkip) {
             leftLinePosition.push(position);
-            if(position !==  boxes * numberOfPointsPerBox)
+            if (position !== boxes * numberOfPointsPerBox)
                 positionsToSkip = 2;
         }
-
         //right
-        const rightLinePositions: number[] = [];
+        const rightLinePositions = [];
         for (let position = boxes * numberOfPointsPerBox + positionsForLine - 1; position < boxes * numberOfPointsPerBox + numberOfPointsPerBox; position = position + 2) {
             rightLinePositions.push(position);
         }
         rightLinePositions[rightLinePositions.length - 1] = rightLinePositions[rightLinePositions.length - 1] + 1;
-
         validPointPositions.push(topLinePositions);
         validPointPositions.push(bottomLinePositions);
         validPointPositions.push(leftLinePosition);
         validPointPositions.push(rightLinePositions);
     }
-
-     
     [1, 3, 4, 6].forEach((startPosition) => {
         validPointPositions.push([startPosition, startPosition + numberOfPointsPerBox, startPosition + numberOfPointsPerBox * 2]);
     });
-
-    
-    
-
+    const scorePointsByIndex = validPointPositions.reduce((acc, cur) => {
+        cur.forEach((ele) => {
+            if (acc[ele]) {
+                acc[ele].push(cur);
+            }
+            else {
+                acc[ele] = [cur];
+            }
+        });
+        return acc;
+    }, {});
     return {
         gamePositions,
         validPointPositions,
+        scorePointsByIndex,
         validMoves
-    }
-}
-
-
-
-export default generateGamePositions();
+    };
+};
+exports.default = generateGamePositions();
+//# sourceMappingURL=gridProperties.js.map

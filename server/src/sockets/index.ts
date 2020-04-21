@@ -14,8 +14,8 @@ const SocketClient = (httpServer: Server) => {
         socket.on('leave', (room: string, fn: any) => leaveGame(socket, room, fn));
        
     
-        socket.on('callServerToUpdatePositions', updateGamePositions);
-        socket.on('callServerToMovePositions', moveGamePositions);
+        socket.on('callServerToUpdateInsertPositions', insertGamePawns);
+        socket.on('callServerToMovePositions', moveGamePawns);
         socket.on('deletePlayerPawns', deletePlayerPawns);
 
         socket.on("disconnect", () => {
@@ -57,7 +57,7 @@ const SocketClient = (httpServer: Server) => {
         });
     }
 
-    const updateGamePositions = (roomId: string, playerId: number, index: number, currentGamePositions: {
+    const insertGamePawns = (roomId: string, playerId: number, index: number, currentGamePositions: {
             [playerId:number] : number[]
         }, pawnsInfo: {
             [playerId:number] : {
@@ -76,11 +76,11 @@ const SocketClient = (httpServer: Server) => {
                 pawnsInfo[playerId].availablePawns = pawnsInfo[playerId].availablePawns - 1;
             }
 
-            updateClientForPlayerPositions(roomId, playerId, index, currentGamePositions, pawnsInfo);
+            updateClientForPawnPositions(roomId, playerId, index, currentGamePositions, pawnsInfo);
            
     }
 
-    const moveGamePositions = (roomId: string, playerId: number, oldIndex: number, newIndex: number, currentGamePositions: {
+    const moveGamePawns = (roomId: string, playerId: number, oldIndex: number, newIndex: number, currentGamePositions: {
         [playerId:number] : number[]
     }, pawnsInfo: {
         [playerId:number] : {
@@ -89,11 +89,11 @@ const SocketClient = (httpServer: Server) => {
         }
     }) => {
         currentGamePositions = {...currentGamePositions, [playerId]: [...currentGamePositions[playerId].filter(t => t !== oldIndex), newIndex] }
-        updateClientForPlayerPositions(roomId, playerId, newIndex, currentGamePositions, pawnsInfo);
+        updateClientForPawnPositions(roomId, playerId, newIndex, currentGamePositions, pawnsInfo);
     }
 
 
-    const updateClientForPlayerPositions = (roomId: string, playerId: number, index: number, currentGamePositions: {
+    const updateClientForPawnPositions = (roomId: string, playerId: number, index: number, currentGamePositions: {
         [playerId:number] : number[]
     }, pawnsInfo: {
         [playerId:number] : {
@@ -101,9 +101,6 @@ const SocketClient = (httpServer: Server) => {
             unavailablePawns: number
         }
     }) => {
-
-      
-
 
         // check if the position placed is a daddy.
         const isDaddy = checkIfPositionIsInDaddy(index, currentGamePositions[playerId]);
@@ -116,12 +113,7 @@ const SocketClient = (httpServer: Server) => {
             positionsToDelete = getPositionsThatCanBeDeletedByPlayer(playerId, currentGamePositions);
         }
 
-        // Game won by current playerId
-        if(Object.keys(pawnsInfo).some(key => pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
-            io.of(gameNameSpace).in(roomId).emit('callClientToUpdateGameCompletion', currentGamePositions, playerId, pawnsInfo, isDaddy);
-        } else {
-            io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, updatedPlayerId, pawnsInfo, isDaddy, positionsToDelete);
-        }
+        informClientOfTheirPawnUpdates(roomId, playerId, currentGamePositions, pawnsInfo, isDaddy, updatedPlayerId, positionsToDelete);
     }
 
     const deletePlayerPawns = (roomId: string, playerId: number, index: number, currentGamePositions: {
@@ -139,7 +131,27 @@ const SocketClient = (httpServer: Server) => {
         const updatedPawns = {...pawnsInfo, [otherPlayerId]:updatedOtherPlayersPawnsInfo};
 
 
-        io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', newPositions, otherPlayerId, updatedPawns, false, []);
+        informClientOfTheirPawnUpdates(roomId, playerId, newPositions, updatedPawns, false, otherPlayerId, []);
+    }
+
+
+    const informClientOfTheirPawnUpdates = (roomId: string, currentPlayerId: number, currentGamePositions: {
+        [playerId:number] : number[]
+    }, pawnsInfo: {
+        [playerId:number] : {
+            availablePawns: number,
+            unavailablePawns: number
+        }
+    }, 
+    isDaddy: boolean,
+    updatedPlayerId: number,
+    positionsToDelete: number[]) => {
+         // Game won by current playerId
+         if(Object.keys(pawnsInfo).some(key => pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
+            io.of(gameNameSpace).in(roomId).emit('callClientToUpdateGameCompletion', currentGamePositions, currentPlayerId, pawnsInfo, isDaddy);
+        } else {
+            io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, updatedPlayerId, pawnsInfo, isDaddy, positionsToDelete);
+        }
     }
     
 
@@ -179,7 +191,6 @@ const SocketClient = (httpServer: Server) => {
     const getPositionsThatCanBeDeletedByPlayer = (playerId: number, currentGamePositions: {
         [playerId:number] : number[]
     }): number[] => {
-        debugger;
         const positionsToDelete: number[] = [];
         const otherPlayerId = Object.keys(currentGamePositions).find(t => t !== playerId.toString());
         if(otherPlayerId && currentGamePositions[parseInt(otherPlayerId, 10)])

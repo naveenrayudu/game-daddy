@@ -10,7 +10,7 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
             unavailablePawns: number
         }
     }) => {
-        socket.emit("callServerToUpdatePositions", roomId, playerId, index, currentGamePositions || {}, pawnsInfo);
+        socket.emit("callServerToUpdateInsertPositions", roomId, playerId, index, currentGamePositions || {}, pawnsInfo);
     }
 
     socket.on("callClientToUpdatePlayerPositions", (gamePositions: {

@@ -15,7 +15,10 @@ const Modal: React.FC<{
         position: 'absolute' as 'absolute',
         top: 0,
         left: 0,
-        background: 'white'
+        background: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     }, ...style}
 
     return (

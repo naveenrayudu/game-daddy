@@ -1,5 +1,6 @@
 import { IAction, IDaddyGameState } from "../../../common/models/redux-state";
 import {DaddyGameTypes} from '../../../common/types';
+import { GameStatusType } from "../../../common/models/types";
 
 const initialState: IDaddyGameState = {
     roomId: '',
@@ -10,20 +11,33 @@ const initialState: IDaddyGameState = {
     positionsToDelete: [],
     isCurrentPlayer: false,
     isDaddy: false,
-    gamePositions: {}
+    gamePositions: {},
+    gameStatus: {
+        type: 'none',
+        playerId: 0
+    }
 }
 
 const daddyReducer = (state = initialState, action: IAction) => {
     switch (action.type) {
         case DaddyGameTypes.CREATE_ROOM:
         case DaddyGameTypes.JOIN_ROOM:
-            return {...state, roomId:action.payload.roomId, playerId:action.payload.playerId, gamePlayerIds: action.payload.players};
-        
+            return {...state,
+                     roomId:action.payload.roomId, 
+                     playerId:action.payload.playerId, 
+                     gamePlayerIds: action.payload.players, 
+                     gameStatus: {
+                            playerId: 0,
+                            type: 'none' as GameStatusType
+                        }
+                    };
+
         case DaddyGameTypes.SWITCH_CURRENT_PLAYER:
             return {...state, isCurrentPlayer: action.payload};
         
         case DaddyGameTypes.CANCEL_ROOM:
-            return {...state, roomId: action.payload};
+        case DaddyGameTypes.LEAVE_ROOM:
+            return initialState;
 
         case DaddyGameTypes.ADD_PLAYERS:
             return {...state, gamePlayerIds: action.payload}
@@ -39,6 +53,18 @@ const daddyReducer = (state = initialState, action: IAction) => {
                      isDaddy: action.payload.isDaddy,
                      positionsToDelete: action.payload.positionsToDelete
                     };
+
+        case DaddyGameTypes.COMPLETED_GAME:
+            return {
+                ...state,
+                gamePositions: action.payload.gamePositions || {}, 
+                pawnsInfo: action.payload.pawnsInfo || {},
+                isDaddy: action.payload.isDaddy || false,
+                gameStatus: {
+                    playerId: action.payload.wonBy,
+                    type: action.payload.completionType as GameStatusType
+                }
+            }    
         default:
             return state;
     }
@@ -70,7 +96,11 @@ const startGameReducer = (state = initialState, action: IAction) => {
             canPlayGame: action.payload.canPlayGame, 
             isCurrentPlayer: state.playerId === action.payload.currentPlayerId, 
             gamePositions:playerPositionsToSet,
-            pawnsInfo: pawnsInfo
+            pawnsInfo: pawnsInfo,
+            gameStatus: {
+                playerId: 0,
+                type: 'inprogress' as GameStatusType
+            }
         }
 }
 

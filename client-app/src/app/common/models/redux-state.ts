@@ -1,3 +1,5 @@
+import { GameStatusType } from "./types";
+
 export interface IAction {
     payload: any,
     type: string
@@ -20,9 +22,20 @@ export interface IDaddyGameState {
     },
     gamePositions: {
         [playerId:number] : number[]
+    },
+    gameStatus: {
+        type: GameStatusType,
+        playerId: number
     }
 }
 
 export interface IAppState {
-    daddyGame: IDaddyGameState
+    daddyGame: IDaddyGameState,
+    modal: IModalState
+}
+
+export interface IModalState {
+    content?: any,
+    styles?: {},
+    allowCloseOutsideDoc?: boolean
 }

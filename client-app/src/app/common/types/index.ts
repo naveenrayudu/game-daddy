@@ -6,9 +6,20 @@ const DaddyGameTypes = {
     CANCEL_ROOM: 'CANCEL_ROOM',
     CREATE_PLAYER_NUMBER: 'CREATE_PLAYER_NUMBER',
     ADD_PLAYERS: 'ADD_PLAYERS',
-    START_GAME: 'START_GAME'
+    START_GAME: 'START_GAME',
+    COMPLETED_GAME: 'COMPLETED_GAME',
+    LEAVE_ROOM: 'LEAVE_ROOM'
 };
 
+
+const ModalTypes = {
+    CREATE_MODAL: 'CREATE_MODAL',
+    REMOVE_MODAL: 'REMOVE_MODAL'
+}
+
+
+
 export {
-    DaddyGameTypes
+    DaddyGameTypes,
+    ModalTypes
 }

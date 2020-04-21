@@ -1,0 +1,104 @@
+.top-border:before {
+    content: "";
+    width: 100%;
+    background: white;
+    height: 2px;
+    position: absolute;
+    animation: widthAnimation 7.5s linear;
+
+}
+
+.bottom-border:before {
+    content: "";
+    width: 100%;
+    background: white;
+    top: 99%;
+    height: 2px;
+    position: absolute;
+    right: 0;
+    animation: delayedWidthAnimation 23.7s linear;
+}
+
+.left-border:before {
+    content: "";
+    width: 2px;
+    background: white;
+    height: 100%;
+    position: absolute;
+    bottom: 0;
+    animation: heightAnimation 15s linear;
+    transform: rotate(-180deg);
+}
+
+.right-border:before {
+    content: "";
+    width: 2px;
+    right: 0%;
+    background: white;
+    height: 100%;
+    position: absolute;
+    animation: delayedHeightAnimation 30s linear;
+}
+
+@keyframes widthAnimation {
+    0% {
+        width: 100%;
+        background-color: green;
+    }
+
+    100% {
+        width: 0%;
+        background-color: green;
+    }
+}
+
+@keyframes delayedWidthAnimation {
+    0% {
+        width: 100%;
+        background-color: green;
+    }
+
+    66.7% {
+        width: 100%;
+        background-color: green;
+    }
+
+    100% {
+        width: 0%;
+        background-color: green;
+    }
+}
+
+@keyframes heightAnimation {
+    0% {
+        height: 100%;
+        background-color: green;
+    }
+
+    50% {
+        height: 100%;
+        background-color: green;
+    }
+
+    100% {
+        height: 0%;
+        background-color: green;
+    }
+}
+
+@keyframes delayedHeightAnimation {
+    0% {
+        height: 100%;
+        background-color: green;
+    }
+
+    75% {
+        height: 100%;
+        background-color: green;
+    }
+
+    100% {
+        height: 0%;
+        background-color: green;
+    }
+}

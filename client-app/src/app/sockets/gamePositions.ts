@@ -25,6 +25,7 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
     },
     isDaddy: boolean,
     positionsToDelete: number[]) => {
+        debugger;
         store.dispatch({
             type: DaddyGameTypes.UPDATE_GAME_POSITIONS,
             payload: {
@@ -48,8 +49,21 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
         socket.emit("deletePlayerPawns", roomId, playerId, index, currentGamePositions || {}, pawnsInfo);
     }
 
+    const moveUserPlays = (playerId: number, roomId: string, oldIndex: number, newIndex: number, currentGamePositions: {
+        [playerId:number] : number[]
+    }, pawnsInfo: {
+        [playerId:number] : {
+            availablePawns: number,
+            unavailablePawns: number
+        }
+    }) => {
+        socket.emit("callServerToMovePositions", roomId, playerId, oldIndex, newIndex, currentGamePositions || {}, pawnsInfo);
+    }
+
+
     return {
         updateUserPlays,
-        deleteUserPawns
+        deleteUserPawns,
+        moveUserPlays
     }
 }

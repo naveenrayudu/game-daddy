@@ -25,8 +25,6 @@ const CreateJoinGame: React.FC<{
                     Join Room
                 </button>
             </div>
-           
-            <button disabled={!!roomId|| playersCount > 1} onClick={leaveRoomEvent}>Leave Room</button>
         </div>
     )
 }

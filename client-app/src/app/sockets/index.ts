@@ -5,16 +5,18 @@ import gameListeners from './game';
 import gamePositions from './gamePositions';
 
 const SocketClient = () => {
-    const {joinRoom, createRoom} = createJoinRoom(socket, store);
+    const {joinRoom, createRoom, leaveRoom} = createJoinRoom(socket, store);
     gameListeners(socket, store);
-    const {updateUserPlays, deleteUserPawns} = gamePositions(socket, store);
+    const {updateUserPlays, deleteUserPawns, moveUserPlays} = gamePositions(socket, store);
 
   
     return {
         joinRoom,
         createRoom,
         updateUserPlays,
-        deleteUserPawns
+        deleteUserPawns,
+        moveUserPlays,
+        leaveRoom
     }
 }
 

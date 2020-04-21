@@ -117,7 +117,7 @@ const SocketClient = (httpServer: Server) => {
         }
 
         // Game won by current playerId
-        if(Object.keys(pawnsInfo).some(key => pawnsInfo[parseInt(key, 10)].availablePawns < 3)) {
+        if(Object.keys(pawnsInfo).some(key => pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
             io.of(gameNameSpace).in(roomId).emit('callClientToUpdateGameCompletion', currentGamePositions, playerId, pawnsInfo, isDaddy);
         } else {
             io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, updatedPlayerId, pawnsInfo, isDaddy, positionsToDelete);

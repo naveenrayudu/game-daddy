@@ -7,9 +7,6 @@ import modalReducer from './game/modal/modal-reducer';
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-
-
-
 const rootReducer = combineReducers<IAppState>({
     daddyGame: daddyReducer,
     modal: modalReducer
@@ -20,8 +17,7 @@ const createAndRetrieveStore = (() => {
     return () => {
         if(store)
             return store;
-        
-        console.log('calling ...')
+
         store = createStore(rootReducer, composeEnhancers(applyMiddleware(reducThunk)));
         return store;
     }

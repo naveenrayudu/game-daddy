@@ -32,7 +32,6 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
 
     const leaveRoom = (roomId: string) => {
         socket.emit("leave", roomId, () => {
-            debugger;
             store.dispatch({
                 type: DaddyGameTypes.LEAVE_ROOM
             })

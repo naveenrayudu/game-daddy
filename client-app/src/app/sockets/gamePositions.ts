@@ -25,7 +25,6 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
     },
     isDaddy: boolean,
     positionsToDelete: number[]) => {
-        debugger;
         store.dispatch({
             type: DaddyGameTypes.UPDATE_GAME_POSITIONS,
             payload: {

@@ -1,6 +1,7 @@
 import { IAction, IDaddyGameState } from "../../../common/models/redux-state";
 import {DaddyGameTypes} from '../../../common/types';
 import { GameStatusType } from "../../../common/models/types";
+import animationReducer from "../animations/animations-reducer";
 
 const initialState: IDaddyGameState = {
     roomId: '',
@@ -15,7 +16,8 @@ const initialState: IDaddyGameState = {
     gameStatus: {
         type: 'none',
         playerId: 0
-    }
+    },
+    animation: {}
 }
 
 const daddyReducer = (state = initialState, action: IAction) => {
@@ -29,7 +31,8 @@ const daddyReducer = (state = initialState, action: IAction) => {
                      gameStatus: {
                             playerId: 0,
                             type: 'none' as GameStatusType
-                        }
+                        },
+                     animation: animationReducer(state, action)
                     };
 
         case DaddyGameTypes.SWITCH_CURRENT_PLAYER:
@@ -51,7 +54,8 @@ const daddyReducer = (state = initialState, action: IAction) => {
                      isCurrentPlayer: state.playerId === action.payload.currentPlayerId,
                      pawnsInfo: action.payload.pawnsInfo,
                      isDaddy: action.payload.isDaddy,
-                     positionsToDelete: action.payload.positionsToDelete
+                     positionsToDelete: action.payload.positionsToDelete,
+                     animation: animationReducer(state, action)
                     };
 
         case DaddyGameTypes.COMPLETED_GAME:
@@ -62,8 +66,9 @@ const daddyReducer = (state = initialState, action: IAction) => {
                 isDaddy: action.payload.isDaddy || false,
                 gameStatus: {
                     playerId: action.payload.wonBy,
-                    type: action.payload.completionType as GameStatusType
-                }
+                    type: action.payload.type as GameStatusType
+                },
+                animation: animationReducer(state, action)
             }    
         default:
             return state;
@@ -100,7 +105,8 @@ const startGameReducer = (state = initialState, action: IAction) => {
             gameStatus: {
                 playerId: 0,
                 type: 'inprogress' as GameStatusType
-            }
+            },
+            animation: animationReducer(state, action)
         }
 }
 

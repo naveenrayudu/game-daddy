@@ -1,4 +1,4 @@
-.currentplayer-unavailable-pawns--class {
+.thisplayer-unavailable-pawns--class {
     grid-area: topleft;
     margin-right: 35%;
     display: flex;
@@ -18,7 +18,7 @@
     align-items: center;
 }
 
-.currentplayer-available-pawns--class {
+.thisplayer-available-pawns--class {
     grid-area: bottomleft;
     display: flex;
     align-items: center;
@@ -51,7 +51,12 @@
     display: grid;
     grid-template-rows: 80% 10%;
     grid-template-columns: 100%;
-    height: 100%;
+    height: 95%;
+}
+
+.current-active--class {
+  border: 2px solid green;
+  margin-top: 5px;
 }
 
 .active-player--class {
@@ -88,7 +93,135 @@
   100% {
     border-top: 1px solid white;
     border-left: 1px solid white;
-      border-bottom: 1px solid white;
+    border-bottom: 1px solid white;
     border-right: 1px solid white;
   }
+}
+
+
+.insertAdded {
+  border-radius: 50%;
+  animation-name: insert_added;
+  animation-duration: 5s;
+}
+
+@keyframes insert_added {
+  from {background-color: green;}
+  to {background-color: transparent;}
+}
+
+
+.daddyRemoved {
+  border-radius: 50%;
+  animation-name: daddy_removed;
+  animation-duration: 5s;
+}
+
+@keyframes daddy_removed {
+  from {background-color: red;}
+  to {background-color: transparent;}
+}
+
+.fromLeftAdded, 
+.fromRightAdded,
+.fromTopAdded,
+.fromBottomAdded {
+  color: black;
+  animation-name: delayed_show;
+  animation-duration: 3s;
+}
+
+@keyframes delayed_show {
+  0% {
+    color: white;
+  }
+
+  70% {
+    color: white;
+  }
+
+  90% {
+    color: black;
+  }
+
+  100% {
+    color: black;
+  }
+}
+
+.fromLeftAdded:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 50%;
+  animation-name: from_left_added;
+  animation-duration: 3s;
+}
+
+@keyframes from_left_added {
+  from {background-color: green;
+        opacity: 0.1;
+        left: -200%;}
+  to {background-color: green;
+      opacity: 0.8;
+      left: 0%}
+}
+
+.fromRightAdded:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 50%;
+  animation-name: from_right_added;
+  animation-duration: 3s;
+}
+
+@keyframes from_right_added {
+  from {background-color: green;
+        opacity: 0.1;
+        left: 200%;}
+  to {background-color: green;
+      opacity: 0.8;
+      left: 0%}
+}
+
+
+.fromTopAdded:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 50%;
+  animation-name: from_top_added;
+  animation-duration: 3s;
+}
+
+@keyframes from_top_added {
+  from {background-color: green;
+        opacity: 0.1;
+        top: -200%;}
+  to {background-color: green;
+      opacity: 0.8;
+      top: 0%}
+}
+
+.fromBottomAdded:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 50%;
+  animation-name: from_bottom_added;
+  animation-duration: 3s;
+}
+
+@keyframes from_bottom_added {
+  from {background-color: green;
+        opacity: 0.1;
+        bottom: -200%;}
+  to {background-color: green;
+      opacity: 0.8;
+      bottom: 0%}
 }

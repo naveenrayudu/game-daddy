@@ -161,6 +161,7 @@ const SocketClient = (httpServer: Server) => {
         }
 
         socket.leave(room, () => {
+            
             if(fn && typeof fn === 'function') {
                 fn();
             }

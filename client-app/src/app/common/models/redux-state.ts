@@ -26,7 +26,8 @@ export interface IDaddyGameState {
     gameStatus: {
         type: GameStatusType,
         playerId: number
-    }
+    },
+    animation: IAnimationState
 }
 
 export interface IAppState {
@@ -38,4 +39,8 @@ export interface IModalState {
     content?: any,
     styles?: {},
     allowCloseOutsideDoc?: boolean
+}
+
+export interface IAnimationState {
+    [index: number]: string
 }

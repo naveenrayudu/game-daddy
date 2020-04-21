@@ -40,11 +40,11 @@ const App: React.FC = () => {
             let payload = {};
             if(gameStatus.playerId === currentPlayerId) {
                 payload = {
-                    content: <WonModal okClickHandler={closeModal} />
+                    content: <WonModal okClickHandler={leaveRoom} />
                 }
             } else {
                 payload = {
-                    content: <LostModal onClickHandler={closeModal} />
+                    content: <LostModal onClickHandler={leaveRoom} />
                 }
             }
 

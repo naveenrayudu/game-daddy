@@ -36,7 +36,7 @@ const Game = () => {
     return (
         <div className="game--class">
             <div className="game-top-bar--class">
-                <div className="currentplayer-unavailable-pawns--class">
+                <div className="thisplayer-unavailable-pawns--class">
                     {
 
                         thisPlayerPawns && <PawnsList count={thisPlayerPawns.unavailablePawns} />
@@ -55,20 +55,20 @@ const Game = () => {
             </div>
 
             <div className="game-bottom-bar--class">
-                <div className={`currentplayer-available-pawns--class`}>
+                <div className={`thisplayer-available-pawns--class ${isCurrentPlayer ? 'current-active--class': ''}`}>
                 {
                     thisPlayerPawns &&
-                    // <TimerBorder showTimer={isCurrentPlayer}>
+                    //  <TimerBorder showTimer={isCurrentPlayer}>
                         <PawnsList count={thisPlayerPawns.availablePawns} />
                     // </TimerBorder>
                 }
                 </div>
-                <div className={`otherplayer-available-pawns--class`}>
+                <div className={`otherplayer-available-pawns--class ${!isCurrentPlayer ? 'current-active--class': ''}`}>
                     {
                         otherPlayerPawns && 
                         // <TimerBorder showTimer={!isCurrentPlayer}>
                             <PawnsList count={otherPlayerPawns.availablePawns} />
-                        // </TimerBorder> 
+                        //  </TimerBorder> 
                     }
                 </div>
             </div>

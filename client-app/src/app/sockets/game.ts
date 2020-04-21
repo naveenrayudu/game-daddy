@@ -28,6 +28,7 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
                 unavailablePawns: number
             }
         }, isDaddy: boolean) => {
+            
         store.dispatch({
             type: DaddyGameTypes.COMPLETED_GAME,
             payload: {

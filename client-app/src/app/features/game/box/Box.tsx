@@ -13,7 +13,7 @@ const Box = () => {
     const numberOfPoints = 8;
     const numberOfBoxes = 3;
 
-    const { gamePositions, playerId, isCurrentPlayer, roomId, pawnsInfo, isDaddy, positionsToDelete, contentInfo, playerGamePositions } = useSelector(((state: IAppState) => {
+    const { gamePositions, playerId, isCurrentPlayer, roomId, pawnsInfo, isDaddy, positionsToDelete, contentInfo, playerGamePositions, animationInfo } = useSelector(((state: IAppState) => {
    
         const updatedContentInfo: string[] = new Array(24);  
         const playerGamePositions: {
@@ -53,7 +53,8 @@ const Box = () => {
             isDaddy: state.daddyGame.isDaddy,
             positionsToDelete: state.daddyGame.positionsToDelete,
             contentInfo: updatedContentInfo,
-            playerGamePositions: playerGamePositions
+            playerGamePositions: playerGamePositions,
+            animationInfo: state.daddyGame.animation
         };
     }));
 
@@ -116,11 +117,11 @@ const Box = () => {
         if(isDaddy && positionsToDelete.indexOf(boxedIndex) !== -1)
             return 'delete';
         
-        if(!isDaddy && !content && pawnsInfo[playerId].availablePawns > 0) {
+        if(!isDaddy && !content && pawnsInfo[playerId] && pawnsInfo[playerId].availablePawns > 0) {
             return 'insert'
         }
 
-        if(!isDaddy && content && pawnsInfo[playerId].availablePawns === 0 && playerGamePositions[playerId][boxedIndex])
+        if(!isDaddy && content && pawnsInfo[playerId] && pawnsInfo[playerId].availablePawns === 0 && playerGamePositions[playerId][boxedIndex])
             return 'grab';
 
         if(!isDaddy && dragIndex !== -1 && !content && gridProperties.validMoves[dragIndex].some(pos => pos === boxedIndex)) {
@@ -148,13 +149,15 @@ const Box = () => {
                                     const content = contentInfo[boxedIndex] ? contentInfo[boxedIndex] : '';
                                     const actionType = getActionType(boxedIndex, content!);
 
+
                                     return <Grid key={index} 
                                                 actionType={actionType}
                                                 boxedIndex={boxedIndex} 
                                                 index={index} 
                                                 userActionHandler={userActionHandler} 
                                                 dragDropHandler= {dragDropHandler}
-                                                content={content!}  />
+                                                content={content!}
+                                                animationClass={animationInfo[boxedIndex]}  />
                                 })
                             }
                         </div>

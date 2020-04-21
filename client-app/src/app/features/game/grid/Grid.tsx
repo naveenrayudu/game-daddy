@@ -11,14 +11,15 @@ const Grid: React.FC<{
     actionType: BoxActionType,
     userActionHandler: (index: number, actionType: BoxActionType) => void,
     dragDropHandler: (index: number, actionType: DropEventType) => void,
-    content: string
-}> = ({boxedIndex, index, actionType, userActionHandler, dragDropHandler, content}) => {
+    content: string,
+    animationClass?: string
+}> = ({boxedIndex, index, actionType, userActionHandler, dragDropHandler, content, animationClass}) => {
     return (
         <div className={`grid_${index}`} style={{
             position:'relative'
         }}>
             <div className={`grid-content--class ${actionType === 'delete' ? 'allow_delete' : ''}`}  style={{
-                border: '1px solid black',
+                border: `${content ? '1px solid black': '1px dotted orange'}`,
                 borderRadius: '50%',
                 background: `${actionType === 'delete'? 'red': 'white'}`,
                 color: `${actionType === 'delete'? 'white': 'black'}`,
@@ -33,7 +34,7 @@ const Grid: React.FC<{
                    actionType === 'grab' ? 
                     (<DragZone content={content} dragDropHandler={dragDropHandler} boxedIndex={boxedIndex} actionType={actionType} userActionHandler={userActionHandler} />)
                     : (
-                        <div style={{
+                        <div className={animationClass ? animationClass: ''} style={{
                             width: '100%',
                             height: '100%',
                             background: 'transparent',

@@ -68,6 +68,7 @@ const daddyReducer = (state = initialState, action: IAction) => {
                     playerId: action.payload.wonBy,
                     type: action.payload.type as GameStatusType
                 },
+                canPlayGame: false,
                 animation: animationReducer(state, action)
             }    
         default:

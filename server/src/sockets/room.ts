@@ -65,8 +65,6 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
     const disconnectRedisRoom = (socket: SocketIO.Socket) => {
 
         const remoteDisconnectCallback = (rooms: string[]) => {
-                redisAdapter.remoteDisconnect(socket.id, false, () => {});
-
             //Inform users regarding the users leaving the room
             rooms.forEach(room => {
                 emitSocketActions(room, 'clientClosedBrowser');

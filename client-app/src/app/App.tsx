@@ -68,9 +68,7 @@ const App: React.FC = () => {
 
             return;
         }
-    }, [gameStatus, currentPlayerId, leaveRoom, closeModal])
-
-    
+    }, [gameStatus, currentPlayerId, leaveRoom, closeModal]);
 
     const createRoom = () => {
         SocketClient.createRoom();
@@ -106,9 +104,9 @@ const App: React.FC = () => {
 
     return (
         <div id="app-container">
-            { canPlayGame && <Game /> }
+            { canPlayGame && <Game onLeaveGame={leaveRoomHandler} /> }
             {!canPlayGame && <CreateJoinGame playersCount={playersCount} roomId={roomId} createRoomEvent={createRoom} joinRoomEvent={joinRoom} leaveRoomEvent={leaveRoom}  /> }
-            {roomId && <LeaveGame leaveRoomEvent={leaveRoomHandler} />}
+            {roomId && !canPlayGame && <LeaveGame leaveRoomEvent={leaveRoomHandler} />}
 
             <Modal content={modal.content} style={modal.styles} />
         </div>

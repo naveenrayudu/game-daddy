@@ -38,19 +38,24 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
         })
     }
 
-
-    socket.on("updateClientForOtherPlayerLeftRoom", () => {
+    const playerLeftGame = () => {
         store.dispatch({
             type: DaddyGameTypes.COMPLETED_GAME,
             payload: {
-                completionType: 'abondoned' as GameStatusType
+                playerId: 0,
+                type: 'abondoned' as GameStatusType
             }
         })
+    }
+
+
+    socket.on("updateClientForOtherPlayerLeftRoom", () => {
+        playerLeftGame();
     })
     
 
     socket.on("clientClosedBrowser", () => {
-       
+        playerLeftGame();
     })
 
     return {

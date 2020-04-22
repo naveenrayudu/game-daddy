@@ -32,6 +32,14 @@
     justify-content: center;
 }
 
+.leave-game--class {
+  grid-area: bottommiddle;
+  justify-content: center;
+  display: flex;
+  flex-grow: 0;
+  align-items: center;
+}
+
 .game-top-bar--class {
     display: grid;
     grid-template-areas: 
@@ -43,7 +51,7 @@
     margin-top: 3%;
     display: grid;
     grid-template-areas: 
-    "bottomleft . bottomright";
+    "bottomleft bottommiddle bottomright";
     grid-template-columns: 40% 20% 40%;
 }
 
@@ -102,7 +110,7 @@
 .insertAdded {
   border-radius: 50%;
   animation-name: insert_added;
-  animation-duration: 5s;
+  animation-duration: 3s;
 }
 
 @keyframes insert_added {
@@ -114,7 +122,7 @@
 .daddyRemoved {
   border-radius: 50%;
   animation-name: daddy_removed;
-  animation-duration: 5s;
+  animation-duration: 3s;
 }
 
 @keyframes daddy_removed {
@@ -128,7 +136,7 @@
 .fromBottomAdded {
   color: black;
   animation-name: delayed_show;
-  animation-duration: 3s;
+  animation-duration: 1s;
 }
 
 @keyframes delayed_show {
@@ -156,7 +164,7 @@
   position: absolute;
   border-radius: 50%;
   animation-name: from_left_added;
-  animation-duration: 3s;
+  animation-duration: 1s;
 }
 
 @keyframes from_left_added {
@@ -175,7 +183,7 @@
   position: absolute;
   border-radius: 50%;
   animation-name: from_right_added;
-  animation-duration: 3s;
+  animation-duration: 1s;
 }
 
 @keyframes from_right_added {
@@ -195,7 +203,7 @@
   position: absolute;
   border-radius: 50%;
   animation-name: from_top_added;
-  animation-duration: 3s;
+  animation-duration: 1s;
 }
 
 @keyframes from_top_added {
@@ -214,7 +222,7 @@
   position: absolute;
   border-radius: 50%;
   animation-name: from_bottom_added;
-  animation-duration: 3s;
+  animation-duration: 1s;
 }
 
 @keyframes from_bottom_added {

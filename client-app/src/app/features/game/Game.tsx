@@ -7,7 +7,9 @@ import './game.css';
 import TimerBorder from '../timer-border/TimerBorder';
 
 
-const Game = () => {
+const Game: React.FC<{
+    onLeaveGame: () => void
+}> = ({onLeaveGame}) => {
     const { playerId, pawnsInfo, gamePlayerIds, roomId, isCurrentPlayer } = useSelector(((state: IAppState) => ({
         playerId: state.daddyGame.playerId,
         pawnsInfo: state.daddyGame.pawnsInfo,
@@ -62,6 +64,9 @@ const Game = () => {
                         <PawnsList count={thisPlayerPawns.availablePawns} />
                     // </TimerBorder>
                 }
+                </div>
+                <div className="leave-game--class">
+                    <button onClick={onLeaveGame}>Leave Game</button>
                 </div>
                 <div className={`otherplayer-available-pawns--class ${!isCurrentPlayer ? 'current-active--class': ''}`}>
                     {

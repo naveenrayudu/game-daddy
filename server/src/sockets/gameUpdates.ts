@@ -139,7 +139,7 @@ const gameUpdates = (io: SocketIO.Server, redisClient: redis.RedisClient) => {
             newPlayerId: clientProps.updatedPlayerId,
             playerPositions: clientProps.gameInfo.playerPositions,
             pawnsInfo: clientProps.gameInfo.pawnsInfo,
-            isDaddy: false,
+            isDaddy: clientProps.isDaddy,
             positionsToDelete: clientProps.positionsToDelete,
             added: clientProps.added,
             deleted: clientProps.deleted

@@ -114,8 +114,9 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
             }
 
             const currentRooms = (JSON.parse(res) as string[] || []).filter(t => t !== room);
-            if(currentRooms.length === 0)
+            if(currentRooms.length === 0) {
                 redisClient.del(socketId);
+            }
             else {
                 redisClient.set(socketId, JSON.stringify(currentRooms));
             }

@@ -13,7 +13,7 @@ const Box = () => {
     const numberOfPoints = 8;
     const numberOfBoxes = 3;
 
-    const { gamePositions, playerId, isCurrentPlayer, roomId, pawnsInfo, isDaddy, positionsToDelete, contentInfo, playerGamePositions, animationInfo } = useSelector(((state: IAppState) => {
+    const { gamePositions, playerId, isCurrentPlayer, gameId, pawnsInfo, isDaddy, positionsToDelete, contentInfo, playerGamePositions, animationInfo } = useSelector(((state: IAppState) => {
    
         const updatedContentInfo: string[] = new Array(24);  
         const playerGamePositions: {
@@ -25,15 +25,15 @@ const Box = () => {
         }
         
 
-        for (const id in state.daddyGame.gamePositions) {
-            if (state.daddyGame.gamePositions.hasOwnProperty(id)) {
+        for (const id in state.daddyGame.playerPositions) {
+            if (state.daddyGame.playerPositions.hasOwnProperty(id)) {
                 const hasPawns = new Array(24); 
                 for(let i = 0; i < hasPawns.length; i++) {
                     hasPawns[i] = false;
                 }
 
                 const playerSymbol = playerSymbols[parseInt(id, 10) - 1];
-                state.daddyGame.gamePositions[id].forEach(t => {
+                state.daddyGame.playerPositions[id].forEach(t => {
                     updatedContentInfo[t] = playerSymbol;
                     hasPawns[t] = true;
                 });
@@ -45,10 +45,10 @@ const Box = () => {
        
 
         return {
-            gamePositions: state.daddyGame.gamePositions,
+            gamePositions: state.daddyGame.playerPositions,
             playerId: state.daddyGame.playerId,
             isCurrentPlayer: state.daddyGame.isCurrentPlayer,
-            roomId: state.daddyGame.roomId,
+            gameId: state.daddyGame.gameId,
             pawnsInfo: state.daddyGame.pawnsInfo,
             isDaddy: state.daddyGame.isDaddy,
             positionsToDelete: state.daddyGame.positionsToDelete,
@@ -98,15 +98,15 @@ const Box = () => {
         if(contentInfo[index])
             return;
        
-        SocketClient.updateUserPlays(playerId, roomId, index, gamePositions, pawnsInfo);
+        SocketClient.submitUserInsertPlays(playerId, gameId, index, gamePositions, pawnsInfo);
     }
 
     const deletePlayerPawn = (index: number) => {
-       SocketClient.deleteUserPawns(playerId, roomId, index, gamePositions, pawnsInfo);
+       SocketClient.deleteUserPawns(playerId, gameId, index, gamePositions, pawnsInfo);
     }
 
     const upldatePlayerPositions = (oldIndex: number, newIndex: number) => {
-        SocketClient.moveUserPlays(playerId, roomId, oldIndex, newIndex, gamePositions, pawnsInfo);
+        SocketClient.moveUserPlays(playerId, gameId, oldIndex, newIndex, gamePositions, pawnsInfo);
     }
 
     const getActionType = (boxedIndex: number, content: string): BoxActionType => {

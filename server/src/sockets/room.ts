@@ -35,9 +35,10 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
             if(clientsCount === daddyPlayers) {
                 const currentPlayerId = Math.ceil((Math.random() * 10)/ 5);
                 const gameInfo = gameHelper.createEmptyGameModel(room, playerIds, currentPlayerId);
+              
 
                 redisClient.set(room, JSON.stringify(gameInfo), () => {
-                    io.of(gameNameSpace).in(room).emit("startGame", gameInfo);
+                    io.of(gameNameSpace).in(room).emit("startGame", {...gameInfo, canPlayGame: true});
                 });
             }
         })

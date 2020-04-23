@@ -2,40 +2,25 @@ import { IAnimationState, IAction, IDaddyGameState } from "../../../common/model
 import { DaddyGameTypes } from "../../../common/types";
 const initialState: IAnimationState = {};
 
-const animationReducer= (state: IDaddyGameState, action: IAction) => {
+const animationReducer= (action: IAction, added?: number, deleted?: number) => {
     switch (action.type) {
         case DaddyGameTypes.UPDATE_GAME_POSITIONS:
-            
-            const isAMove = Object.keys(state.pawnsInfo).map(t => parseInt(t, 10)).every(t => (state.pawnsInfo[t].availablePawns === action.payload.pawnsInfo[t].availablePawns)
-                                                            && (state.pawnsInfo[t].unavailablePawns === action.payload.pawnsInfo[t].unavailablePawns))
-            let removed: number | undefined;
-            let added: number | undefined;
-        
-            state.gamePlayerIds.forEach((key) => {
-                if(!removed && state.gamePositions[key])
-                    removed = state.gamePositions[key].find(position => (action.payload.gamePositions[key] as number[] || []).indexOf(position) === -1);
-
-                if(!added && state.gamePositions[key])
-                    added = (action.payload.gamePositions[key] as number[]).find(position => (state.gamePositions[key] || []).indexOf(position) === -1);
-            });
-
-        if(added !== undefined && isAMove && removed !== undefined) {
-            const addRemoveAnimations = animationType(removed, added);
-            return {
-                    [added]: addRemoveAnimations[0],
-                    // [removed]: addRemoveAnimations[1]
-            } 
-        }
-
-        if(added !== undefined)
+            if(added !== undefined &&   deleted !== undefined) {
+                const addRemoveAnimations = animationType(deleted, added);
                 return {
-                    [added] : 'insertAdded'
-                }
-
-        if(removed !== undefined)
-            return {
-                [removed]: 'daddyRemoved'
+                        [added]: addRemoveAnimations[0]
+                } 
             }
+
+            if(added !== undefined)
+                    return {
+                        [added] : 'insertAdded'
+                    }
+
+            if(deleted !== undefined)
+                return {
+                    [deleted]: 'daddyRemoved'
+                }
 
             return initialState;
         default:

@@ -14,7 +14,7 @@ const Game: React.FC<{
         playerId: state.daddyGame.playerId,
         pawnsInfo: state.daddyGame.pawnsInfo,
         gamePlayerIds: state.daddyGame.gamePlayerIds,
-        roomId: state.daddyGame.roomId,
+        roomId: state.daddyGame.gameId,
         isCurrentPlayer: state.daddyGame.isCurrentPlayer
     })))
 
@@ -41,7 +41,7 @@ const Game: React.FC<{
                 <div className="thisplayer-unavailable-pawns--class">
                     {
 
-                        thisPlayerPawns && <PawnsList count={thisPlayerPawns.unavailablePawns} />
+                        thisPlayerPawns && <PawnsList isThisPlayer={true} count={thisPlayerPawns.unavailablePawns} isAvalilablePawns={false}  />
                     }
                 </div>
                 <div className="game-game-grid--class">
@@ -51,7 +51,7 @@ const Game: React.FC<{
                 </div>
                 <div className="otherplayer-unavailable-pawns--class">
                     {
-                        otherPlayerPawns && <PawnsList count={otherPlayerPawns.unavailablePawns} />
+                        otherPlayerPawns && <PawnsList isThisPlayer={false} count={otherPlayerPawns.unavailablePawns} isAvalilablePawns={false} />
                     }
                 </div>
             </div>
@@ -61,7 +61,7 @@ const Game: React.FC<{
                 {
                     thisPlayerPawns &&
                     //  <TimerBorder showTimer={isCurrentPlayer}>
-                        <PawnsList count={thisPlayerPawns.availablePawns} />
+                        <PawnsList isThisPlayer={true} count={thisPlayerPawns.availablePawns} isAvalilablePawns={true}  />
                     // </TimerBorder>
                 }
                 </div>
@@ -72,7 +72,7 @@ const Game: React.FC<{
                     {
                         otherPlayerPawns && 
                         // <TimerBorder showTimer={!isCurrentPlayer}>
-                            <PawnsList count={otherPlayerPawns.availablePawns} />
+                            <PawnsList isThisPlayer={false} count={otherPlayerPawns.availablePawns} isAvalilablePawns={true}  />
                         //  </TimerBorder> 
                     }
                 </div>

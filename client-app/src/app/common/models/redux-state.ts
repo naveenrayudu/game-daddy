@@ -1,28 +1,36 @@
 import { GameStatusType } from "./types";
 
-export interface IAction {
+export interface IAction{
     payload: any,
     type: string
 }
 
+export interface IPlayerPositions {
+    [playerId:number] : number[]
+}
 
-export interface IDaddyGameState {
-    roomId: string,
+export interface IPawnsInfo {
+    [playerId:number] : {
+        availablePawns: number,
+        unavailablePawns: number
+    }
+}
+
+export interface IGameInfo {
+    gameId: string,
+    currentPlayerId: number,
+    gamePlayerIds: number[],
+    pawnsInfo: IPawnsInfo,
+    playerPositions: IPlayerPositions
+}
+
+export interface IDaddyGameState extends IGameInfo {
+    gameId: string,
     playerId: number,
     isCurrentPlayer: boolean,
     canPlayGame: boolean,
     isDaddy: boolean,
-    gamePlayerIds: number[],
     positionsToDelete: number[],
-    pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
-        }
-    },
-    gamePositions: {
-        [playerId:number] : number[]
-    },
     gameStatus: {
         type: GameStatusType,
         playerId: number
@@ -43,4 +51,15 @@ export interface IModalState {
 
 export interface IAnimationState {
     [index: number]: string
+}
+
+
+export interface IClientUpdateProps {
+    playerPositions: IPlayerPositions,
+    pawnsInfo: IPawnsInfo,
+    added?: number, 
+    deleted?: number
+    isDaddy: boolean,
+    newPlayerId: number,
+    positionsToDelete: number[],
 }

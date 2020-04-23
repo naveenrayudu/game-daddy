@@ -4,11 +4,11 @@ import { GameStatusType } from "../common/models/types";
 
 export default (socket: SocketIOClient.Socket, store: Store) => {
     const joinRoom = (room: string) => {
-        socket.emit("join", room, (roomId: string, playerId: number, players: number[]) => {
+        socket.emit("join", room, (gameId: string, playerId: number, players: number[]) => {
            store.dispatch({
                type: DaddyGameTypes.JOIN_ROOM,
                payload: {
-                   roomId: roomId,
+                   gameId,
                    playerId,
                    players
                }
@@ -17,11 +17,11 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
     }
 
     const createRoom = () => {
-        socket.emit("create", (roomId: string, playerId: number, players: number[]) => {
+        socket.emit("create", (gameId: string, playerId: number, players: number[]) => {
             store.dispatch({
                 type: DaddyGameTypes.CREATE_ROOM,
                 payload: {
-                    roomId,
+                    gameId,
                     playerId,
                     players
                 }

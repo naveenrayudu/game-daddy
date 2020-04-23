@@ -16,7 +16,7 @@ import Abondoned from './features/game/game-modals/abondoned/Abondoned';
 
 const App: React.FC = () => {
     const {roomId, playersCount, canPlayGame, gameStatus, currentPlayerId, modal} = useSelector(((state: IAppState) => ({
-        roomId: state.daddyGame.roomId,
+        roomId: state.daddyGame.gameId,
         playersCount: state.daddyGame.gamePlayerIds.length,
         canPlayGame: state.daddyGame.canPlayGame,
         gameStatus: state.daddyGame.gameStatus,

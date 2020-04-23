@@ -1,13 +1,14 @@
 import { DaddyGameTypes } from "../common/types";
 import { Store } from "redux";
 import { GameStatusType } from "../common/models/types";
+import { IGameInfo, IClientUpdateProps } from "../common/models/redux-state";
 
 export default (socket: SocketIOClient.Socket, store: Store) => {
-    socket.on("startgame", (currentPlayerId: number) => {
+    socket.on("startGame", (gameInfo: IGameInfo) => {
         store.dispatch({
             type: DaddyGameTypes.START_GAME,
             payload: {
-                currentPlayerId: currentPlayerId,
+                ...gameInfo,
                 canPlayGame: true
             }
         })
@@ -20,22 +21,14 @@ export default (socket: SocketIOClient.Socket, store: Store) => {
        })
     });
 
-    socket.on("callClientToUpdateGameCompletion", (gamePositions: {
-            [playerId:number] : number[]
-        },wonBy: number ,pawnsInfo: {
-            [playerId:number] : {
-                availablePawns: number,
-                unavailablePawns: number
-            }
-        }, isDaddy: boolean) => {
-            
+    socket.on("callClientToUpdateGameCompletion", (clientProps: IClientUpdateProps) => {
         store.dispatch({
             type: DaddyGameTypes.COMPLETED_GAME,
             payload: {
-                gamePositions,
-                pawnsInfo,
-                isDaddy,
-                wonBy,
+                playerPositions: clientProps.playerPositions,
+                pawnsInfo: clientProps.pawnsInfo,
+                isDaddy: clientProps.isDaddy,
+                wonBy: clientProps.newPlayerId,
                 type: 'completed' as GameStatusType
             }
         })

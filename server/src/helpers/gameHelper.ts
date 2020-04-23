@@ -1,4 +1,5 @@
 import GirdProperties from './gridProperties';
+import {IPawnsInfo, IPlayerPositions, IGameInfo} from '../models/gameModels';
 
 const getPositionsThatCanBeDeletedByPlayer = (playerId: number, currentGamePositions: {
     [playerId:number] : number[]
@@ -37,7 +38,30 @@ const checkIfPositionIsInDaddy = (position: number, currentPlayerPositions: numb
     });
 }
 
+
+const createEmptyGameModel = (gameId: string, playerIds: number[], currentPlayerId: number): IGameInfo => {
+    const pawnsInfo: IPawnsInfo = {};
+    const playerPositions: IPlayerPositions = {};
+
+    playerIds.forEach((playerId) => {
+        playerPositions[playerId] = [];
+        pawnsInfo[playerId] = {
+            availablePawns: 9,
+            unavailablePawns: 0
+        }
+    })
+
+    return {
+        gameId,
+        currentPlayerId,
+        gamePlayerIds: playerIds,
+        pawnsInfo,
+        playerPositions
+    }
+}
+
 export default {
     getPositionsThatCanBeDeletedByPlayer,
-    checkIfPositionIsInDaddy
+    checkIfPositionIsInDaddy,
+    createEmptyGameModel
 }

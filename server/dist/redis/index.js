@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = __importDefault(require("redis"));
 const socket_io_redis_1 = __importDefault(require("socket.io-redis"));
 const redisOptions = {
-    port: 13144,
-    host: 'redis-13144.c93.us-east-1-3.ec2.cloud.redislabs.com',
-    password: '8ANzxHx4IUrWgf86y7rS86pZxumPYjuF'
+    port: parseInt(process.env.REDIS_PORT, 10),
+    host: process.env.REDIS_ENDPOINT,
+    password: process.env.REDIS_PASSWORD
 };
 const redisClient = redis_1.default.createClient(redisOptions);
 const pubClient = redis_1.default.createClient(redisOptions);

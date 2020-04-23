@@ -16,7 +16,7 @@ const SocketClient = (httpServer: Server, redis: {
 
     const gameNameSpace = '/daddy';
     const {createRedisRoom, joinRedisRoom, leaveRedisRoom, disconnectRedisRoom} = socketIORoomHandler(io, redis.redisClient);
-    const {insertGamePawns, moveGamePawns, deletePlayerPawns} = gameUpdates(io);
+    const {insertGamePawns, moveGamePawns, deletePlayerPawns} = gameUpdates(io, redis.redisClient);
 
    
 

@@ -11,7 +11,7 @@ const SocketClient = (httpServer, redis) => {
     io = io.adapter(redis.redisAdapter);
     const gameNameSpace = '/daddy';
     const { createRedisRoom, joinRedisRoom, leaveRedisRoom, disconnectRedisRoom } = room_1.default(io, redis.redisClient);
-    const { insertGamePawns, moveGamePawns, deletePlayerPawns } = gameUpdates_1.default(io);
+    const { insertGamePawns, moveGamePawns, deletePlayerPawns } = gameUpdates_1.default(io, redis.redisClient);
     io.of(gameNameSpace).on("connection", (socket) => {
         socket.on("create", (fn) => createRedisRoom(socket, fn));
         socket.on("join", (room, fn) => joinRedisRoom(socket, room, fn));

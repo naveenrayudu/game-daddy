@@ -2,12 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import http from 'http';
 import path from 'path';
+import './config';
 import redis from './redis';
-
 import SocketClient from './sockets';
 
 
-import './config/index';
+
 
 const app = express();
 const httpServer = http.createServer(app);

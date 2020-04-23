@@ -1,5 +1,6 @@
 import socketIORedis from 'socket.io-redis';
 import redis from 'redis';
+import gameHelper from '../helpers/gameHelper'
 
 const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient) => {
     const gameNameSpace = '/daddy';
@@ -13,13 +14,11 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
                 console.log(err);
                 return;
             }
-              
+
             // Save the socket client room.
             addRoomToSocket(socket.id, room);
            
             const clientsCount = getRoomClientsCount(room);
-        
-
             const playerIds = [];
             for(let i = 0; i < clientsCount; i++) {
                 playerIds.push(i + 1);
@@ -31,14 +30,16 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
 
             // Update existing clients regarding the join.
             socket.in(room).emit("updateclientfornewplayers", playerIds);
-
             
             // allow starting the game if all the players joined the game.
             if(clientsCount === daddyPlayers) {
                 const currentPlayerId = Math.ceil((Math.random() * 10)/ 5);
-                io.of(gameNameSpace).in(room).emit("startgame", currentPlayerId);
+                const gameInfo = gameHelper.createEmptyGameModel(room, playerIds, currentPlayerId);
+
+                redisClient.set(room, JSON.stringify(gameInfo), () => {
+                    io.of(gameNameSpace).in(room).emit("startGame", gameInfo);
+                });
             }
-            
         })
     }
 
@@ -56,7 +57,11 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
 
             removeRoomFromSocket(socket.id, room);
             if(getRoomClientsCount(room) > 0) {
-                emitSocketActions(room, 'updateClientForOtherPlayerLeftRoom');
+                // By doing this we will emit only when the game is incomplete..
+                redisClient.get(room, (err, gameInfo) => {
+                    if(gameInfo)
+                        emitSocketActions(room, 'updateClientForOtherPlayerLeftRoom');
+                })
             }
         });
     }
@@ -92,7 +97,10 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
             const currentRooms = JSON.parse(res) as string[] || [];
             currentRooms.push(room);
 
-            redisClient.set(socketId, JSON.stringify(currentRooms));
+            redisClient.set(socketId, JSON.stringify(currentRooms), (err) => {
+                if(err)
+                    console.log(err);
+            });
         });
     }
 

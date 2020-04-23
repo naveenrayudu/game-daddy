@@ -1,108 +1,161 @@
 import gameHelper from '../helpers/gameHelper';
+import redis from 'redis';
+import { IGameInfo, IPlayerPositions, IPawnsInfo } from '../models/gameModels';
 
 
-const gameUpdates = (io: SocketIO.Server) => {
+interface updatePlayerPositionProps {
+    playerId: number,
+    index: number,
+    gameInfo: IGameInfo, 
+    added?: number, 
+    deleted?: number
+}
+
+interface clientEmitProps extends updatePlayerPositionProps {
+    isDaddy: boolean,
+    updatedPlayerId: number,
+    positionsToDelete: number[],
+}
+
+
+export interface IClientUpdateProps {
+    playerPositions: IPlayerPositions,
+    pawnsInfo: IPawnsInfo,
+    added?: number, 
+    deleted?: number
+    isDaddy: boolean,
+    newPlayerId: number,
+    positionsToDelete: number[],
+}
+
+
+
+const gameUpdates = (io: SocketIO.Server, redisClient: redis.RedisClient) => {
     const gameNameSpace = '/daddy';
     const daddyPlayers = 2;
 
-    const insertGamePawns = (roomId: string, playerId: number, index: number, currentGamePositions: {
-        [playerId:number] : number[]
-    }, pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
+    const insertGamePawns = (roomId: string, playerId: number, index: number) => {
+        const insertGamePawnsCalBack = (gameInfo: IGameInfo) => {
+            if(!gameInfo.playerPositions[playerId]) {
+                gameInfo.playerPositions[playerId] = [index];
+            } else {
+                gameInfo.playerPositions[playerId].push(index);
+            }
+    
+            if(gameInfo.pawnsInfo[playerId]) {
+                gameInfo.pawnsInfo[playerId].availablePawns = gameInfo.pawnsInfo[playerId].availablePawns - 1;
+            }
+    
+            updateClientForPawnPositions({
+                playerId, 
+                index, 
+                gameInfo, 
+                added:index, 
+                deleted: undefined
+            });
         }
-    }) => {
 
-        if(!currentGamePositions[playerId]) {
-            currentGamePositions[playerId] = [index];
-        } else {
-            currentGamePositions = {...currentGamePositions, [playerId]: [...currentGamePositions[playerId], index] }
-        }
+        redisClient.get(roomId, (err, value) => {
+            if(err)
+                return;
 
-        if(pawnsInfo[playerId]) {
-            pawnsInfo[playerId].availablePawns = pawnsInfo[playerId].availablePawns - 1;
-        }
-
-        updateClientForPawnPositions(roomId, playerId, index, currentGamePositions, pawnsInfo);
+            insertGamePawnsCalBack(JSON.parse(value) as IGameInfo);
+        })
        
     }
 
-    const moveGamePawns = (roomId: string, playerId: number, oldIndex: number, newIndex: number, currentGamePositions: {
-        [playerId:number] : number[]
-    }, pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
-        }
-    }) => {
-        currentGamePositions = {...currentGamePositions, [playerId]: [...currentGamePositions[playerId].filter(t => t !== oldIndex), newIndex] }
-        updateClientForPawnPositions(roomId, playerId, newIndex, currentGamePositions, pawnsInfo);
+    const moveGamePawns = (roomId: string, playerId: number, oldIndex: number, newIndex: number) => {
+        const moveGamePawnsCalBack = (gameInfo: IGameInfo) => {
+            gameInfo.playerPositions[playerId] = gameInfo.playerPositions[playerId].filter(t => t !== oldIndex);
+            gameInfo.playerPositions[playerId].push(newIndex);
+
+                updateClientForPawnPositions({
+                    playerId, 
+                    index: newIndex, 
+                    gameInfo, 
+                    added: newIndex, 
+                    deleted:oldIndex
+                })
+            };
+
+        redisClient.get(roomId, (err, value) => {
+            if(err)
+                return;
+
+            moveGamePawnsCalBack(JSON.parse(value) as IGameInfo);
+        })
     }
 
-
-    const updateClientForPawnPositions = (roomId: string, playerId: number, index: number, currentGamePositions: {
-        [playerId:number] : number[]
-    }, pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
-        }
-    }) => {
+    const updateClientForPawnPositions = (info: updatePlayerPositionProps) => {
 
         // check if the position placed is a daddy.
-        const isDaddy = gameHelper.checkIfPositionIsInDaddy(index, currentGamePositions[playerId]);
+        const isDaddy = gameHelper.checkIfPositionIsInDaddy(info.index, info.gameInfo.playerPositions[info.playerId]);
 
-        let updatedPlayerId = playerId % daddyPlayers + 1;
+        let updatedPlayerId = info.playerId % daddyPlayers + 1;
         let positionsToDelete: number[] = [];
         if(isDaddy)
         {
-            updatedPlayerId = playerId;
-            positionsToDelete = gameHelper.getPositionsThatCanBeDeletedByPlayer(playerId, currentGamePositions);
+            updatedPlayerId = info.playerId;
+            positionsToDelete = gameHelper.getPositionsThatCanBeDeletedByPlayer(info.playerId, info.gameInfo.playerPositions);
         }
 
-        informClientOfTheirPawnUpdates(roomId, playerId, currentGamePositions, pawnsInfo, isDaddy, updatedPlayerId, positionsToDelete);
+        info.gameInfo.currentPlayerId = updatedPlayerId;
+
+        const clientProps = Object.assign({}, info, {isDaddy: isDaddy, updatedPlayerId: updatedPlayerId, positionsToDelete: positionsToDelete});
+        informClientOfTheirPawnUpdates(clientProps);
+     
     }
 
-    const deletePlayerPawns = (roomId: string, playerId: number, index: number, currentGamePositions: {
-        [playerId:number] : number[]
-    }, pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
+    const deletePlayerPawns = (roomId: string, playerId: number, index: number) => {
+        const deleteGamePawnsCalBack = (gameInfo: IGameInfo) => {
+            const updatedPlayerId = playerId % daddyPlayers + 1;
+            gameInfo.playerPositions[updatedPlayerId] = gameInfo.playerPositions[updatedPlayerId].filter(t => t !== index);
+            gameInfo.pawnsInfo[updatedPlayerId].unavailablePawns = gameInfo.pawnsInfo[updatedPlayerId].unavailablePawns + 1;
+
+            const clientProps = {
+                        isDaddy: false, 
+                        updatedPlayerId: updatedPlayerId, 
+                        positionsToDelete: [] as number[],
+                        playerId: playerId,
+                        gameInfo: gameInfo,
+                        index: index,
+                        deleted: index
+                    };
+            informClientOfTheirPawnUpdates(clientProps);
         }
-    }) => {
-        const otherPlayerId = playerId % daddyPlayers + 1;
-        const updatedOtherPlayerPosition = currentGamePositions[otherPlayerId].filter(t => t !== index);
-        const updatedOtherPlayersPawnsInfo = {...pawnsInfo[otherPlayerId], unavailablePawns: pawnsInfo[otherPlayerId].unavailablePawns + 1 };
-        const newPositions = {...currentGamePositions, [otherPlayerId]:updatedOtherPlayerPosition};
-        const updatedPawns = {...pawnsInfo, [otherPlayerId]:updatedOtherPlayersPawnsInfo};
 
+        redisClient.get(roomId, (err, value) => {
+            if(err)
+                return;
 
-        informClientOfTheirPawnUpdates(roomId, playerId, newPositions, updatedPawns, false, otherPlayerId, []);
+            deleteGamePawnsCalBack(JSON.parse(value) as IGameInfo);
+        })
     }
 
 
-    const informClientOfTheirPawnUpdates = (roomId: string, currentPlayerId: number, currentGamePositions: {
-        [playerId:number] : number[]
-    }, pawnsInfo: {
-        [playerId:number] : {
-            availablePawns: number,
-            unavailablePawns: number
+    const informClientOfTheirPawnUpdates = (clientProps: clientEmitProps) => {
+
+        const clientPropsToPass: IClientUpdateProps = {
+            newPlayerId: clientProps.updatedPlayerId,
+            playerPositions: clientProps.gameInfo.playerPositions,
+            pawnsInfo: clientProps.gameInfo.pawnsInfo,
+            isDaddy: false,
+            positionsToDelete: clientProps.positionsToDelete,
+            added: clientProps.added,
+            deleted: clientProps.deleted
         }
-    }, 
-    isDaddy: boolean,
-    updatedPlayerId: number,
-    positionsToDelete: number[]) => {
+
         // Game won by current playerId
-        if(Object.keys(pawnsInfo).some(key => pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
-            io.of(gameNameSpace).in(roomId).emit('callClientToUpdateGameCompletion', currentGamePositions, currentPlayerId, pawnsInfo, isDaddy);
+        if(Object.keys(clientProps.gameInfo.pawnsInfo).some(key => clientProps.gameInfo.pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
+            clientPropsToPass.newPlayerId = clientProps.playerId;
+            io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdateGameCompletion', clientPropsToPass);
+            redisClient.del(clientProps.gameInfo.gameId);
+            
         } else {
-            io.of(gameNameSpace).in(roomId).emit('callClientToUpdatePlayerPositions', currentGamePositions, updatedPlayerId, pawnsInfo, isDaddy, positionsToDelete);
+            io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdatePlayerPositions', clientPropsToPass);
+            redisClient.set(clientProps.gameInfo.gameId, JSON.stringify(clientProps.gameInfo));
         }
     }
-
-
 
     return {
         insertGamePawns,

@@ -31,8 +31,27 @@ const checkIfPositionIsInDaddy = (position, currentPlayerPositions) => {
         return validPosition.every(t => currentPlayerPositions.indexOf(t) !== -1);
     });
 };
+const createEmptyGameModel = (gameId, playerIds, currentPlayerId) => {
+    const pawnsInfo = {};
+    const playerPositions = {};
+    playerIds.forEach((playerId) => {
+        playerPositions[playerId] = [];
+        pawnsInfo[playerId] = {
+            availablePawns: 9,
+            unavailablePawns: 0
+        };
+    });
+    return {
+        gameId,
+        currentPlayerId,
+        gamePlayerIds: playerIds,
+        pawnsInfo,
+        playerPositions
+    };
+};
 exports.default = {
     getPositionsThatCanBeDeletedByPlayer,
-    checkIfPositionIsInDaddy
+    checkIfPositionIsInDaddy,
+    createEmptyGameModel
 };
 //# sourceMappingURL=gameHelper.js.map

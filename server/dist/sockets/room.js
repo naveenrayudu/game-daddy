@@ -1,5 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const gameHelper_1 = __importDefault(require("../helpers/gameHelper"));
 const socketIORoomHandler = (io, redisClient) => {
     const gameNameSpace = '/daddy';
     const daddyPlayers = 2;
@@ -25,7 +29,10 @@ const socketIORoomHandler = (io, redisClient) => {
             // allow starting the game if all the players joined the game.
             if (clientsCount === daddyPlayers) {
                 const currentPlayerId = Math.ceil((Math.random() * 10) / 5);
-                io.of(gameNameSpace).in(room).emit("startgame", currentPlayerId);
+                const gameInfo = gameHelper_1.default.createEmptyGameModel(room, playerIds, currentPlayerId);
+                redisClient.set(room, JSON.stringify(gameInfo), () => {
+                    io.of(gameNameSpace).in(room).emit("startGame", gameInfo);
+                });
             }
         });
     };
@@ -40,13 +47,16 @@ const socketIORoomHandler = (io, redisClient) => {
             }
             removeRoomFromSocket(socket.id, room);
             if (getRoomClientsCount(room) > 0) {
-                emitSocketActions(room, 'updateClientForOtherPlayerLeftRoom');
+                // By doing this we will emit only when the game is incomplete..
+                redisClient.get(room, (err, gameInfo) => {
+                    if (gameInfo)
+                        emitSocketActions(room, 'updateClientForOtherPlayerLeftRoom');
+                });
             }
         });
     };
     const disconnectRedisRoom = (socket) => {
         const remoteDisconnectCallback = (rooms) => {
-            redisAdapter.remoteDisconnect(socket.id, false, () => { });
             //Inform users regarding the users leaving the room
             rooms.forEach(room => {
                 emitSocketActions(room, 'clientClosedBrowser');
@@ -67,7 +77,10 @@ const socketIORoomHandler = (io, redisClient) => {
             }
             const currentRooms = JSON.parse(res) || [];
             currentRooms.push(room);
-            redisClient.set(socketId, JSON.stringify(currentRooms));
+            redisClient.set(socketId, JSON.stringify(currentRooms), (err) => {
+                if (err)
+                    console.log(err);
+            });
         });
     };
     const removeRoomFromSocket = (socketId, room) => {

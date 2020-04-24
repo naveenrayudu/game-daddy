@@ -6,8 +6,9 @@ const DragZone: React.FC<{
     actionType: BoxActionType, 
     userActionHandler: (index: number, actionType: BoxActionType) => void,
     dragDropHandler: (index: number, actionType: DropEventType) => void,
-    content: string
-}> = ({boxedIndex, actionType, dragDropHandler, userActionHandler, content}) => {
+    content: string,
+    altContent: string
+}> = ({boxedIndex, actionType, dragDropHandler, userActionHandler, content, altContent}) => {
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -43,7 +44,7 @@ const DragZone: React.FC<{
             alignItems: 'center',
             justifyContent: 'center'
         }} draggable={true} onDragEnd={onDragEndEvent} onClick={eventHandler} onDragStart={onDragStart} >
-            {content}
+           {content ? <img src={content} alt={altContent}/>: null}
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import socketIORedis from 'socket.io-redis';
 import redis from 'redis';
-import gameHelper from '../helpers/gameHelper'
+import gameHelper from '../helpers/gameHelper';
+import { createOrUpdateRoom, saveGameInfoToRoom } from '../database/createRoom';
 
 const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient) => {
     const gameNameSpace = '/daddy';
@@ -35,12 +36,14 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
             if(clientsCount === daddyPlayers) {
                 const currentPlayerId = Math.ceil((Math.random() * 10)/ 5);
                 const gameInfo = gameHelper.createEmptyGameModel(room, playerIds, currentPlayerId);
-              
 
                 redisClient.set(room, JSON.stringify(gameInfo), () => {
                     io.of(gameNameSpace).in(room).emit("startGame", {...gameInfo, canPlayGame: true});
                 });
             }
+
+            createOrUpdateRoom(room, socket.id);
+            
         })
     }
 
@@ -69,7 +72,6 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
 
 
     const disconnectRedisRoom = (socket: SocketIO.Socket) => {
-
         const remoteDisconnectCallback = (rooms: string[]) => {
             //Inform users regarding the users leaving the room
             rooms.forEach(room => {
@@ -77,14 +79,17 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
             })
         }
 
-        redisClient.get(socket.id, (err, room) => {
+        redisClient.get(socket.id, (err, roomsString) => {
             if(err)
                 return;
-        
-            remoteDisconnectCallback(JSON.parse(room) as string[] || []);
-            redisClient.del(socket.id);
+
+            const rooms = JSON.parse(roomsString) as string[] || [];
+            remoteDisconnectCallback(rooms);
+
+            redisClient.del(socket.id, () => {
+                rooms.forEach(room => deleteRoomsNotAssociatedWithAnySocket(room));
+            });
         })
-        
     }
 
     const addRoomToSocket = (socketId: string, room: string) => {
@@ -115,12 +120,31 @@ const socketIORoomHandler = (io: SocketIO.Server, redisClient: redis.RedisClient
 
             const currentRooms = (JSON.parse(res) as string[] || []).filter(t => t !== room);
             if(currentRooms.length === 0) {
-                redisClient.del(socketId);
+                redisClient.del(socketId, (err, reply) => {
+                    if(!err)
+                        deleteRoomsNotAssociatedWithAnySocket(room);
+                });
             }
             else {
-                redisClient.set(socketId, JSON.stringify(currentRooms));
+                redisClient.set(socketId, JSON.stringify(currentRooms), (err, reply) => {
+                    if(reply === 'OK')
+                        deleteRoomsNotAssociatedWithAnySocket(room);
+                });
             }
         });
+    }
+
+
+    const deleteRoomsNotAssociatedWithAnySocket = (room: string) => {
+        if(getRoomClientsCount(room) === 0) {
+            redisClient.get(room, (err, gameString) => {
+                const gameInfo = JSON.parse(gameString);
+
+                saveGameInfoToRoom(room, gameInfo)
+                    .then(() => redisClient.del(room))
+                    .catch(() => redisClient.del(room));
+            })
+        }
     }
 
 

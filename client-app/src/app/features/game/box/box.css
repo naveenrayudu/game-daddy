@@ -64,6 +64,22 @@
     align-items: center;
 }
 
+.grid_3 {
+    margin-left: -2%;
+}
+
+.grid_4 {
+    margin-right: -2%;
+}
+
+.grid_1 {
+    margin-top: -2%;
+}
+
+.grid_6 {
+    margin-bottom: -2%;
+}
+
 .box--class {
     display: grid;
     position: absolute;

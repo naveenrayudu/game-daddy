@@ -90,7 +90,7 @@ const gameUpdates = (io, redisClient) => {
             newPlayerId: clientProps.updatedPlayerId,
             playerPositions: clientProps.gameInfo.playerPositions,
             pawnsInfo: clientProps.gameInfo.pawnsInfo,
-            isDaddy: false,
+            isDaddy: clientProps.isDaddy,
             positionsToDelete: clientProps.positionsToDelete,
             added: clientProps.added,
             deleted: clientProps.deleted
@@ -99,7 +99,6 @@ const gameUpdates = (io, redisClient) => {
         if (Object.keys(clientProps.gameInfo.pawnsInfo).some(key => clientProps.gameInfo.pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
             clientPropsToPass.newPlayerId = clientProps.playerId;
             io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdateGameCompletion', clientPropsToPass);
-            redisClient.del(clientProps.gameInfo.gameId);
         }
         else {
             io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdatePlayerPositions', clientPropsToPass);

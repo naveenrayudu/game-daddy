@@ -6,8 +6,10 @@ import SocketClient from '../../../sockets';
 import gridProperties from '../../../helpers/gridProperties';
 import './box.css';
 import { BoxActionType, DropEventType } from '../../../common/models/types';
+import robot from '../../../images/robot.png';
+import monster from '../../../images/monster.png';
 
-const playerSymbols = ['X', 'O'];
+
 
 const Box = () => {
     const numberOfPoints = 8;
@@ -24,7 +26,6 @@ const Box = () => {
             updatedContentInfo[i] = '';
         }
         
-
         for (const id in state.daddyGame.playerPositions) {
             if (state.daddyGame.playerPositions.hasOwnProperty(id)) {
                 const hasPawns = new Array(24); 
@@ -32,9 +33,9 @@ const Box = () => {
                     hasPawns[i] = false;
                 }
 
-                const playerSymbol = playerSymbols[parseInt(id, 10) - 1];
+                const currentPlayerId = parseInt(id, 10);
                 state.daddyGame.playerPositions[id].forEach(t => {
-                    updatedContentInfo[t] = playerSymbol;
+                    updatedContentInfo[t] = currentPlayerId === state.daddyGame.playerId ? robot: monster;
                     hasPawns[t] = true;
                 });
 
@@ -62,9 +63,6 @@ const Box = () => {
 
     const userActionHandler = (index: number, actionType: BoxActionType) => {
         switch (actionType) {
-            case 'insert':
-                placePlayerPositions(index);
-                break;
             case 'delete':
                 deletePlayerPawn(index);
                 break;
@@ -82,7 +80,7 @@ const Box = () => {
                 setDragIndex(index);
                 break;
             case 'ondrop':
-                upldatePlayerPositions(dragIndex, index);
+                dragIndex === -1 ? placePlayerPositions(index) : upldatePlayerPositions(dragIndex, index);
                 setDragIndex(-1);
                 break;
             default:
@@ -118,7 +116,7 @@ const Box = () => {
             return 'delete';
         
         if(!isDaddy && !content && pawnsInfo[playerId] && pawnsInfo[playerId].availablePawns > 0) {
-            return 'insert'
+            return 'drop';
         }
 
         if(!isDaddy && content && pawnsInfo[playerId] && pawnsInfo[playerId].availablePawns === 0 && playerGamePositions[playerId][boxedIndex])
@@ -148,6 +146,7 @@ const Box = () => {
                                     const boxedIndex = boxNumber * numberOfPoints + index;
                                     const content = contentInfo[boxedIndex] ? contentInfo[boxedIndex] : '';
                                     const actionType = getActionType(boxedIndex, content!);
+                                    const isThisPlayerGrid = playerGamePositions[playerId][boxedIndex];
 
 
                                     return <Grid key={index} 
@@ -157,6 +156,7 @@ const Box = () => {
                                                 userActionHandler={userActionHandler} 
                                                 dragDropHandler= {dragDropHandler}
                                                 content={content!}
+                                                altContent={isThisPlayerGrid ? 'Your pawn': 'Opponent Pawn'}
                                                 animationClass={animationInfo[boxedIndex]}  />
                                 })
                             }

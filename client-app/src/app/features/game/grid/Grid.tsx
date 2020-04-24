@@ -12,8 +12,9 @@ const Grid: React.FC<{
     userActionHandler: (index: number, actionType: BoxActionType) => void,
     dragDropHandler: (index: number, actionType: DropEventType) => void,
     content: string,
+    altContent: string
     animationClass?: string
-}> = ({boxedIndex, index, actionType, userActionHandler, dragDropHandler, content, animationClass}) => {
+}> = ({boxedIndex, index, actionType, userActionHandler, dragDropHandler, content, animationClass, altContent}) => {
     return (
         <div className={`grid_${index}`} style={{
             position:'relative'
@@ -23,8 +24,8 @@ const Grid: React.FC<{
                 borderRadius: '50%',
                 background: `${actionType === 'delete'? 'red': 'white'}`,
                 color: `${actionType === 'delete'? 'white': 'black'}`,
-                height: '20%',
-                width: '20%',
+                height: '25%',
+                width: '25%',
                 position:'absolute'
             }}>
                 {
@@ -32,7 +33,7 @@ const Grid: React.FC<{
                     <DropZone dragDropHandler={dragDropHandler} boxedIndex={boxedIndex} actionType={actionType} />
                    ):
                    actionType === 'grab' ? 
-                    (<DragZone content={content} dragDropHandler={dragDropHandler} boxedIndex={boxedIndex} actionType={actionType} userActionHandler={userActionHandler} />)
+                    (<DragZone content={content} dragDropHandler={dragDropHandler} boxedIndex={boxedIndex} actionType={actionType} userActionHandler={userActionHandler} altContent={altContent} />)
                     : (
                         <div className={animationClass ? animationClass: ''} style={{
                             width: '100%',
@@ -43,7 +44,7 @@ const Grid: React.FC<{
                             alignItems: 'center',
                             cursor: `${actionType === 'none' ? 'not-allowed' : 'pointer'}`
                         }} onClick={() => userActionHandler(boxedIndex, actionType)}>
-                            {content}
+                          {content ? <img src={content} alt={altContent} /> : null }
                         </div>
                     )
                 }

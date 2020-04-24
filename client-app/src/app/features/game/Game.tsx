@@ -5,6 +5,7 @@ import PawnsList from './pawns/PawnsList';
 import GameGrid from './game-grids/GameGrid';
 import './game.css';
 import TimerBorder from '../timer-border/TimerBorder';
+import HealthStatus from './health-status/HealthStatus';
 
 
 const Game: React.FC<{
@@ -40,8 +41,7 @@ const Game: React.FC<{
             <div className="game-top-bar--class">
                 <div className="thisplayer-unavailable-pawns--class">
                     {
-
-                        thisPlayerPawns && <PawnsList isThisPlayer={true} count={thisPlayerPawns.unavailablePawns} isAvalilablePawns={false}  />
+                        <HealthStatus unavailablePawns={thisPlayerPawns.unavailablePawns} isThisPlayer={true}  />
                     }
                 </div>
                 <div className="game-game-grid--class">
@@ -51,7 +51,7 @@ const Game: React.FC<{
                 </div>
                 <div className="otherplayer-unavailable-pawns--class">
                     {
-                        otherPlayerPawns && <PawnsList isThisPlayer={false} count={otherPlayerPawns.unavailablePawns} isAvalilablePawns={false} />
+                        <HealthStatus  unavailablePawns={otherPlayerPawns.unavailablePawns} isThisPlayer={false} />
                     }
                 </div>
             </div>
@@ -59,10 +59,10 @@ const Game: React.FC<{
             <div className="game-bottom-bar--class">
                 <div className={`thisplayer-available-pawns--class ${isCurrentPlayer ? 'current-active--class': ''}`}>
                 {
-                    thisPlayerPawns &&
-                    //  <TimerBorder showTimer={isCurrentPlayer}>
-                        <PawnsList isThisPlayer={true} count={thisPlayerPawns.availablePawns} isAvalilablePawns={true}  />
-                    // </TimerBorder>
+                    thisPlayerPawns && thisPlayerPawns.availablePawns > 0 ?
+                  
+                        <PawnsList  isCurrentPlayer={isCurrentPlayer} isThisPlayer={true} count={thisPlayerPawns.availablePawns} />
+                        : <div>Your move</div>
                 }
                 </div>
                 <div className="leave-game--class">
@@ -70,10 +70,11 @@ const Game: React.FC<{
                 </div>
                 <div className={`otherplayer-available-pawns--class ${!isCurrentPlayer ? 'current-active--class': ''}`}>
                     {
-                        otherPlayerPawns && 
-                        // <TimerBorder showTimer={!isCurrentPlayer}>
-                            <PawnsList isThisPlayer={false} count={otherPlayerPawns.availablePawns} isAvalilablePawns={true}  />
-                        //  </TimerBorder> 
+                        otherPlayerPawns && otherPlayerPawns.availablePawns > 0 ?
+                            <PawnsList isCurrentPlayer={isCurrentPlayer} isThisPlayer={false} count={otherPlayerPawns.availablePawns} />
+                            :
+                            <div>Opponents Move</div>
+                      
                     }
                 </div>
             </div>

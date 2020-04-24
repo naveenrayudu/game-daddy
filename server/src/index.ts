@@ -7,8 +7,6 @@ import redis from './redis';
 import SocketClient from './sockets';
 
 
-
-
 const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;

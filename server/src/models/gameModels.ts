@@ -14,5 +14,6 @@ export interface IGameInfo {
     currentPlayerId: number,
     gamePlayerIds: number[],
     pawnsInfo: IPawnsInfo,
-    playerPositions: IPlayerPositions
+    playerPositions: IPlayerPositions,
+    isCompleted: boolean
 }

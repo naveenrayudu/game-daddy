@@ -56,7 +56,8 @@ const createEmptyGameModel = (gameId: string, playerIds: number[], currentPlayer
         currentPlayerId,
         gamePlayerIds: playerIds,
         pawnsInfo,
-        playerPositions
+        playerPositions,
+        isCompleted: false
     }
 }
 

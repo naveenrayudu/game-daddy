@@ -147,13 +147,19 @@ const gameUpdates = (io: SocketIO.Server, redisClient: redis.RedisClient) => {
 
         // Game won by current playerId
         if(Object.keys(clientProps.gameInfo.pawnsInfo).some(key => clientProps.gameInfo.pawnsInfo[parseInt(key, 10)].unavailablePawns >= 7)) {
+            
+            //set game to completed status.
+            clientProps.gameInfo.isCompleted = true;
+            
             clientPropsToPass.newPlayerId = clientProps.playerId;
             io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdateGameCompletion', clientPropsToPass);
+
             
         } else {
             io.of(gameNameSpace).in(clientProps.gameInfo.gameId).emit('callClientToUpdatePlayerPositions', clientPropsToPass);
-            redisClient.set(clientProps.gameInfo.gameId, JSON.stringify(clientProps.gameInfo));
+            
         }
+        redisClient.set(clientProps.gameInfo.gameId, JSON.stringify(clientProps.gameInfo));
     }
 
     return {

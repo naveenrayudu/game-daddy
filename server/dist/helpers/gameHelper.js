@@ -46,7 +46,8 @@ const createEmptyGameModel = (gameId, playerIds, currentPlayerId) => {
         currentPlayerId,
         gamePlayerIds: playerIds,
         pawnsInfo,
-        playerPositions
+        playerPositions,
+        isCompleted: false
     };
 };
 exports.default = {
